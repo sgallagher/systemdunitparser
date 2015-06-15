@@ -2,3 +2,8 @@
 *.swp
 ~.py[co]
 *__pycache__*
+*.patch
+.idea
+/build
+/dist
+/MANIFEST
