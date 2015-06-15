@@ -91,9 +91,6 @@ class SystemdUnitParser(configparser.RawConfigParser):
                 if mo:
                     sectname = mo.group('header')
                     if sectname in self._sections:
-                        if self._strict and sectname in elements_added:
-                            raise DuplicateSectionError(sectname, fpname,
-                                                        lineno)
                         cursect = self._sections[sectname]
                         elements_added.add(sectname)
                     elif sectname == self.default_section:
@@ -101,13 +98,13 @@ class SystemdUnitParser(configparser.RawConfigParser):
                     else:
                         cursect = self._dict()
                         self._sections[sectname] = cursect
-                        self._proxies[sectname] = SectionProxy(self, sectname)
+                        self._proxies[sectname] = configparser.SectionProxy(self, sectname)
                         elements_added.add(sectname)
                     # So sections can't start with a continuation line
                     optname = None
                 # no section header in the file?
                 elif cursect is None:
-                    raise MissingSectionHeaderError(fpname, lineno, line)
+                    raise configparser.MissingSectionHeaderError(fpname, lineno, line)
                 # an option line?
                 else:
                     mo = self._optcre.match(value)
@@ -116,16 +113,19 @@ class SystemdUnitParser(configparser.RawConfigParser):
                         if not optname:
                             e = self._handle_error(e, fpname, lineno, line)
                         optname = self.optionxform(optname.rstrip())
-                        if (self._strict and
-                                    (sectname, optname) in elements_added):
-                            raise DuplicateOptionError(sectname, optname,
-                                                       fpname, lineno)
                         elements_added.add((sectname, optname))
                         # This check is fine because the OPTCRE cannot
                         # match if it would set optval to None
                         if optval is not None:
                             optval = optval.strip()
-                            cursect[optname] = [optval]
+                            # Check if this optname already exists
+                            if (optname in cursect) and (cursect[optname] is not None):
+                                # If it does, convert it to a tuple if it isn't already one
+                                if not isinstance(cursect[optname], tuple):
+                                    cursect[optname] = tuple(cursect[optname])
+                                cursect[optname] = cursect[optname] + tuple([optval])
+                            else:
+                                cursect[optname] = [optval]
                         else:
                             # valueless option handling
                             cursect[optname] = None
