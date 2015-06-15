@@ -17,6 +17,7 @@ class SystemdUnitParser(configparser.RawConfigParser):
 
     def __init__(self):
         configparser.RawConfigParser.__init__(self, empty_lines_in_values=False, strict=False)
+        self.optionxform = lambda option: option
 
     def _read(self, fp, fpname):
         """Parse a sectioned configuration file.
@@ -139,3 +140,45 @@ class SystemdUnitParser(configparser.RawConfigParser):
         if e:
             raise e
         self._join_multiline_values()
+
+    def _validate_value_types(self, *, section="", option="", value=""):
+        """Raises a TypeError for non-string values.
+
+        The only legal non-string value if we allow valueless
+        options is None, so we need to check if the value is a
+        string if:
+        - we do not allow valueless options, or
+        - we allow valueless options but the value is not Noneconfigparser.RawConfigParser
+
+        For compatibility reasons this method is not used in classic set()
+        for RawConfigParsers. It is invoked in every case for mapping protocol
+        access and in ConfigParser.set().
+        """
+        if not isinstance(section, str):
+            raise TypeError("section names must be strings")
+        if not isinstance(option, str):
+            raise TypeError("option keys must be strings")
+        if not self._allow_no_value or value:
+            if not isinstance(value, str) and not isinstance(value, tuple):
+                raise TypeError("option values must be strings or a tuple of strings")
+
+    # Write out duplicate keys with their values
+    def _write_section(self, fp, section_name, section_items, delimiter):
+        """Write a single section to the specified `fp'."""
+        fp.write("[{}]\n".format(section_name))
+        for key, vals in section_items:
+            vals = self._interpolation.before_write(self, section_name, key,
+                                                    vals)
+            if not isinstance(vals, tuple):
+                vals = tuple([vals])
+            for value in vals:
+                if value is not None or not self._allow_no_value:
+                    value = delimiter + str(value).replace('\n', '\n\t')
+                else:
+                    value = ""
+                fp.write("{}{}\n".format(key, value))
+        fp.write("\n")
+
+    # Default to not creating spaces around the delimiter
+    def write(self, fp, space_around_delimiters=False):
+        configparser.RawConfigParser.write(self, fp, space_around_delimiters)
