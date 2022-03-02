@@ -1,0 +1,8 @@
+[Unit]
+Description=Sample Unit
+
+[Service]
+Type=oneshot
+ExecStartPre=/bin/sh -c "foo && bar && baz"
+ExecStartPre=/bin/sh -c "magic"
+ExecStart=/usr/bin/application
