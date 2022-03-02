@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='systemdunitparser',
-    version='0.1',
+    version='0.2',
     packages=['SystemdUnitParser'],
     url='http://github.com/sgallagh/systemdunitparser',
     license='GPL-3.0-or-later',
