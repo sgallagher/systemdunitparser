@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  workflow_dispatch: 
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    permissions:
+      id-token: write
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+
+    - name: Build
+      run: |
+        python3 setup.py build sdist bdist_wheel --universal
+
+    - name: Publish package
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        packages-dir: systemdunitparser/dist
