@@ -19,6 +19,19 @@ class SystemdUnitParser(configparser.RawConfigParser):
         configparser.RawConfigParser.__init__(self, empty_lines_in_values=False, strict=False)
         self.optionxform = lambda option: option
 
+    def _get_inline_prefixes(self):
+        # Fix for newer cython
+        if hasattr(self, '_inline_comment_prefixes'):
+            return self._inline_comment_prefixes
+        else:
+            return self._prefixes.inline
+        
+    def _get_comment_prefixes(self):
+        if hasattr(self, '_comment_prefixes'):
+            return self._comment_prefixes
+        else:
+            return self._prefixes.full
+
     def _read(self, fp, fpname):
         """Parse a sectioned configuration file.
 
@@ -46,7 +59,7 @@ class SystemdUnitParser(configparser.RawConfigParser):
         for lineno, line in enumerate(fp, start=1):
             comment_start = sys.maxsize
             # strip inline comments
-            inline_prefixes = {p: -1 for p in self._inline_comment_prefixes}
+            inline_prefixes = {p: -1 for p in self._get_inline_prefixes()}
             while comment_start == sys.maxsize and inline_prefixes:
                 next_prefixes = {}
                 for prefix, index in inline_prefixes.items():
@@ -58,7 +71,7 @@ class SystemdUnitParser(configparser.RawConfigParser):
                         comment_start = min(comment_start, index)
                 inline_prefixes = next_prefixes
             # strip full line comments
-            for prefix in self._comment_prefixes:
+            for prefix in self._get_comment_prefixes():
                 if line.strip().startswith(prefix):
                     comment_start = 0
                     break
