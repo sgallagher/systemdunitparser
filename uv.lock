@@ -79,7 +79,7 @@ wheels = [
 
 [[package]]
 name = "systemdunitparser"
-version = "0.3"
+version = "0.4"
 source = { editable = "." }
 
 [package.optional-dependencies]
