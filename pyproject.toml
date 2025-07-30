@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "systemdunitparser"
-version = "0.3"
+version = "0.4"
 description = "Parser to read and create unit files for systemd"
 readme = "README.md"
 license = { text = "GPL-3.0-or-later" }
