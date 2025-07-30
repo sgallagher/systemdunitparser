@@ -1,3 +1,6 @@
+import configparser
+import sys
+
 __author__ = 'sgallagh'
 
 """
@@ -7,9 +10,6 @@ http://stackoverflow.com/questions/13921323/handling-duplicate-keys-with-configp
 LICENSE: https://creativecommons.org/licenses/by-sa/3.0/ (CC-BY-SA 3.0)
 Original Author: Praetorian on StackExchange
 """
-
-import configparser
-import sys
 
 
 class SystemdUnitParser(configparser.RawConfigParser):
