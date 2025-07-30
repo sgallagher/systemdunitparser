@@ -1,6 +1,5 @@
 import os
 
-import pytest
 from SystemdUnitParser import SystemdUnitParser
 
 TESTDIR = os.path.abspath(os.path.dirname(__file__))
