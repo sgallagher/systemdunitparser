@@ -12,7 +12,7 @@ setup(
     long_description=_long_description,
     long_description_content_type="text/markdown",
     packages=['SystemdUnitParser'],
-    url='http://github.com/sgallagh/systemdunitparser',
+    url='http://github.com/sgallagher/systemdunitparser',
     version='0.3',
     license_files=('LICENSE',),
     classifiers=[
