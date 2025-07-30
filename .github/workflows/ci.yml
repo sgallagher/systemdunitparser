@@ -1,0 +1,65 @@
+name: Continuous Integration
+
+on:
+  push: {}
+  pull_request: {}
+  schedule:
+    - cron: '0 0 * * *' # Run daily at midnight
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - '3.9'
+          - '3.10'
+          - '3.11'
+          - '3.12'
+          - '3.13'
+          - '3.14'
+          - '>=3.9' # Always test the latest version available
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Build package with uv
+        run: |
+          uv build
+
+      - name: Install test dependencies
+        run: |
+          pip install .[test]
+
+      - name: Run pytest
+        run: |
+          pytest
+
+
+  ruff:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '>=3.9'
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Run ruff check
+        run: ruff check .
