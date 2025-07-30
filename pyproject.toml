@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "systemdunitparser"
+version = "0.3"
+description = "Parser to read and create unit files for systemd"
+readme = "README.md"
+license = { text = "GPL-3.0-or-later" }
+authors = [
+    { name = "Stephen Gallagher", email = "sgallagh@redhat.com" }
+]
+classifiers = [
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3 :: Only",
+]
+requires-python = ">=3.9"
+
+[project.urls]
+Homepage = "http://github.com/sgallagher/systemdunitparser"
+Repository = "http://github.com/sgallagher/systemdunitparser"
+
+[tool.setuptools.packages.find]
+include = ["SystemdUnitParser*"]
+
+[tool.setuptools.package-data]
+"*" = ["LICENSE"]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=6.0",
+]
+dev = [
+    "pytest>=6.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+]
