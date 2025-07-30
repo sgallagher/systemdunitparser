@@ -15,22 +15,27 @@ Original Author: Praetorian on StackExchange
 class SystemdUnitParser(configparser.RawConfigParser):
     """ConfigParser allowing duplicate keys. Values are stored in a list"""
 
-    def __init__(self):
-        configparser.RawConfigParser.__init__(self, empty_lines_in_values=False, strict=False)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, empty_lines_in_values=False, strict=False, **kwargs)
         self.optionxform = lambda option: option
+
+        self._inline_comment_prefixes = kwargs.get('inline_comment_prefixes', None)
+        self._comment_prefixes = kwargs.get('comment_prefixes', ('#', ';'))
 
     def _get_inline_prefixes(self):
         # Fix for newer cython
         if hasattr(self, '_inline_comment_prefixes'):
-            return self._inline_comment_prefixes
-        else:
-            return self._prefixes.inline
+            return self._inline_comment_prefixes or ()
+        elif hasattr(self, '_prefixes'):
+            return self._prefixes.inline or ()
+        return ()
         
     def _get_comment_prefixes(self):
         if hasattr(self, '_comment_prefixes'):
-            return self._comment_prefixes
-        else:
-            return self._prefixes.full
+            return self._comment_prefixes or ()
+        elif hasattr(self, '_prefixes'):
+            return self._prefixes.full or ()
+        return ()
 
     def _read(self, fp, fpname):
         """Parse a sectioned configuration file.
